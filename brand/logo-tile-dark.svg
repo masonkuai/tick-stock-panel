@@ -1,17 +1,12 @@
-<!-- Tick Stock Panel · 场景底卡 — 深色圆角卡 + 亮紫渐变主标
-     规格: 64 网格; 圆角 12.5%; 描边 #232838; 对应 logo-tile-dark-*.png -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Tick Stock Panel">
-  <defs>
-    <linearGradient id="tsp-tile-dark" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#C4B5FD"/>
-      <stop offset="1" stop-color="#8B5CF6"/>
-    </linearGradient>
-  </defs>
-  <rect x="0.3" y="0.3" width="63.4" height="63.4" rx="7.7" fill="#191C25" stroke="#232838" stroke-width="0.6"/>
-  <g transform="translate(12 12) scale(0.625)">
-    <path d="M20 9 H11 V55 H20" stroke="url(#tsp-tile-dark)" stroke-width="5" stroke-linejoin="miter" stroke-linecap="butt"/>
-    <path d="M44 9 H53 V55 H44" stroke="url(#tsp-tile-dark)" stroke-width="5" stroke-linejoin="miter" stroke-linecap="butt"/>
-    <line x1="32" y1="15" x2="32" y2="49" stroke="url(#tsp-tile-dark)" stroke-width="3.5" stroke-linecap="butt" stroke-opacity="0.55"/>
-    <rect x="26.5" y="19.5" width="11" height="17" fill="url(#tsp-tile-dark)"/>
-  </g>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1_29)">
+<rect width="64" height="64" fill="white"/>
+<path d="M56 0.300003H7.99999C3.7474 0.300003 0.299988 3.74741 0.299988 8V56C0.299988 60.2526 3.7474 63.7 7.99999 63.7H56C60.2526 63.7 63.7 60.2526 63.7 56V8C63.7 3.74741 60.2526 0.300003 56 0.300003Z" fill="#191C25" stroke="#232838" stroke-width="0.6"/>
+<path d="M16.3231 25.9584C15.2947 25.4003 14.527 24.4508 14.1889 23.3186C13.8507 22.1864 13.9699 20.9643 14.52 19.9212C15.0702 18.8781 16.0064 18.0994 17.1226 17.7564C18.2388 17.4134 19.4436 17.5343 20.472 18.0923L29.2696 22.8676C30.0735 23.3046 30.9738 23.5269 31.8858 23.5135C32.7978 23.5002 33.6914 23.2516 34.4826 22.7913L43.4145 17.5908C44.4265 17.0024 45.6275 16.8459 46.7533 17.1556C47.8791 17.4654 48.8374 18.2161 49.4175 19.2425C49.9976 20.269 50.152 21.4872 49.8466 22.6291C49.5412 23.771 48.8011 24.7431 47.7891 25.3315L39.1904 30.3248C38.3706 30.8023 37.6896 31.4907 37.2159 32.3205C36.7422 33.1503 36.4927 34.0921 36.4925 35.051V42.3719C36.4925 43.5994 36.0118 44.7765 35.1561 45.6445C34.3005 46.5124 33.1399 47 31.9298 47C30.7197 47 29.5592 46.5124 28.7035 45.6445C27.8478 44.7765 27.3671 43.5994 27.3671 42.3719V35.22C27.3675 34.2331 27.1038 33.2646 26.604 32.4179C26.1043 31.5711 25.3873 30.8778 24.5295 30.412L16.3231 25.9639V25.9584Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_1_29">
+<rect width="64" height="64" fill="white"/>
+</clipPath>
+</defs>
 </svg>
