@@ -946,7 +946,7 @@ export interface AiIterateResult {
 export interface CustomSignalCondition {
   left: string     // 字段名
   op: string       // > >= < <= == !=
-  right: string    // "field:xxx" 或数字字符串
+  right: string | number  // "field:xxx" 或数字常量 (迁移的历史信号常量为 number, 后端两者均合法)
   leftDays?: number   // 左字段取几日前 (0=当日, 默认)
   rightDays?: number  // 右字段取几日前 (仅 right 为字段时有意义)
 }
@@ -2650,10 +2650,14 @@ export const api = {
     request<{ ok: boolean }>('/api/settings/ai', { method: 'DELETE' }),
 
   /** 草稿连通性测试 — 只验证当前表单值, 不保存任何配置 */
-  testAiSettings: (ai: { provider?: string; base_url?: string; api_key?: string; model?: string; protocol?: string }) =>
+  testAiSettings: (
+    ai: { provider?: string; base_url?: string; api_key?: string; model?: string; protocol?: string },
+    opts?: { timeoutMs?: number },
+  ) =>
     request<{ ok: boolean; model?: string; response?: string; error?: string; error_type?: string }>('/api/settings/ai/test', {
       method: 'POST',
       body: JSON.stringify(ai),
+      ...(opts?.timeoutMs != null ? { timeoutMs: opts.timeoutMs } : {}),
     }),
 
   upgradeGuardStatus: () => request<UpgradeGuardStatus>('/api/upgrade-guard/status'),
@@ -3995,14 +3999,15 @@ export const api = {
     ),
 
   extDataSchemaAll: () =>
-    request<{ items: { id: string; label: string; mode: string; time_field?: string | null; columns: { name: string; type: string; label: string }[] }[] }>('/api/ext-data/schema-all'),
+    request<{ items: { id: string; label: string; mode: string; time_field?: string | null; granularity?: 'intraday' | 'daily' | null; columns: { name: string; type: string; label: string }[] }[] }>('/api/ext-data/schema-all'),
 
   /** 日内多盘序列 (列表迷你图列): 每标的一天的 [HH:MM:SS, value] 点列 */
-  extDataSeries: (configId: string, field: string, date?: string | null, symbols?: string[]) =>
-    request<{ config_id: string; field: string; date: string | null; items: Record<string, [string, number][]> }>(
+  extDataSeries: (configId: string, field: string, date?: string | null, symbols?: string[], days?: number) =>
+    request<{ config_id: string; field: string; date: string | null; granularity?: 'intraday' | 'daily'; days?: number; items: Record<string, [string, number][]> }>(
       `/api/ext-data/${configId}/series?field=${encodeURIComponent(field)}`
         + (date ? `&date=${date}` : '')
-        + (symbols?.length ? `&symbols=${encodeURIComponent(symbols.join(','))}` : ''),
+        + (symbols?.length ? `&symbols=${encodeURIComponent(symbols.join(','))}` : '')
+        + (days ? `&days=${days}` : ''),
     ),
 
   extDataPullConfig: (id: string, body: {
@@ -4017,6 +4022,7 @@ export const api = {
     date_param?: string | null;
     time_field?: string | null;
     since_param?: string | null;
+    granularity?: 'auto' | 'intraday' | 'daily';
     auth?: ExtPullAuth;
     timeout_seconds?: number;
     page_param?: string | null;
@@ -4914,12 +4920,14 @@ export interface DataStatus {
     ext_data_files?: number
     ext_data_size_mb?: number
     total_size_mb: number
-  }
+  } | null  // busy 降级 (预热/同步/修复期间) 且冷启动缓存未热时为 null, 不代表无数据
   next_pipeline_run: string | null
   next_instruments_run: string | null
   last_pipeline_run: string | null
   last_instruments_run: string | null
   checked_at: string
+  /** 预热/同步/修复期间统计暂不可用或仅为旧缓存, 空值不代表无数据。 */
+  stats_pending?: boolean
   indicators_ready?: boolean
 }
 
@@ -4979,6 +4987,8 @@ export interface PullConfig {
   date_format?: string
   /** 日内序列表时间列名 (如 "ts"): 配置后同 symbol 允许多行 (按 symbol+时间列去重), 用于集合竞价等多盘数据 */
   time_field?: string | null
+  /** 序列粒度: auto=按数据形态自动判断 | intraday=日内多盘 | daily=日级别 (决定 series 口径与列表迷你图形态) */
+  granularity?: 'auto' | 'intraday' | 'daily'
   /** 增量续传参数名 (如 "since"): 每次拉取自动带上本地目标日分区时间列最大值, 源只返回其后数据; 需先配置 time_field */
   since_param?: string | null
   auth?: ExtPullAuth | null
@@ -5074,7 +5084,9 @@ export interface ExtDataConfig {
   latest_sync_date?: string | null
   date_range?: string[] | null
   /** 日内多盘表最新分区的盘次概览; 非多盘表为 null */
-  plate?: { date: string; plates: number; from: string; to: string } | null
+  plate?: { date: string; plates: number; from: string; to: string; granularity: 'intraday' | 'daily' } | null
+  /** 生效序列粒度 (显式声明 > 数据形态判断): intraday | daily; snapshot 表为 null */
+  granularity_effective?: 'intraday' | 'daily' | null
   pull?: PullConfig | null
 }
 
