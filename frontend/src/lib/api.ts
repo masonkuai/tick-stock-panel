@@ -749,7 +749,8 @@ export interface AiReviewReport {
 
 // ===== 龙虎榜 (fuyao 专有, 复盘页) =====
 export interface DragonTigerStockItem {
-  thscode: string
+  /** 后端已归一 (缺失时由 ticker 推导); 旧缓存/异常数据源可能为 null, 消费方需兜底 */
+  thscode: string | null
   ticker?: string | null
   name?: string | null
   change?: number | null      // 当日涨跌幅 (小数制)
@@ -1615,6 +1616,8 @@ export interface MiningLockStatus {
     host?: string
     schema_version?: number
   } | null
+  /** 持有者线索来源: 锁文件内容 / 旧格式锁经操作系统扫描反查 */
+  holder_source?: 'file' | 'os-scan' | null
   holder_alive: boolean
   pid_consistent: boolean
   active_runs: number
